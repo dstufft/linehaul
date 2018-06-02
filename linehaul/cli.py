@@ -54,10 +54,12 @@ __version__ = raven.fetch_package_version("linehaul")
 @click.option("--metrics-port", type=int, default=12000)
 @click.option("--sentry-dsn")
 @click.option("--log-file")
+@click.option("--bigquery-url")
 @click.argument("table", envvar="BIGQUERY_TABLE")
 @click.pass_context
 async def main(ctx, bind, port, token, account, key, reuse_port, tls_ciphers,
-               tls_certificate, metrics_port, sentry_dsn, log_file, table):
+               tls_certificate, metrics_port, sentry_dsn, log_file,
+               bigquery_url, table):
     # Configure logging
     target_logger = "logfile" if log_file else "console"
     logging.config.dictConfig({
@@ -109,7 +111,10 @@ async def main(ctx, bind, port, token, account, key, reuse_port, tls_ciphers,
     # Start up our metrics server in another thread.
     prometheus_client.start_http_server(metrics_port)
 
-    bqc = BigQueryClient(*table.split(":"), client_id=account, key=key.read())
+    if key is not None:
+        key = key.read()
+
+    bqc = BigQueryClient(*table.split(":"), client_id=account, key=key)
 
     if tls_certificate is not None:
         ssl_context = tls.create_context(tls_certificate, tls_ciphers)

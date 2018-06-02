@@ -27,7 +27,7 @@ GOOGLE_TOKEN_URL = "https://www.googleapis.com/oauth2/v4/token"
 BIGQUERY_SCOPE = "https://www.googleapis.com/auth/bigquery"
 
 STREAMING_URL = (
-    "https://www.googleapis.com/bigquery/v2/projects/{project_id}/"
+    "{base_url}projects/{project_id}/"
     "datasets/{dataset_id}/tables/{table_id}/insertAll"
 )
 
@@ -43,9 +43,11 @@ class BigQueryEncoder(json.JSONEncoder):
 
 class _BigQueryClientSession:
 
-    def __init__(self, client):
+    def __init__(self, client,
+                 base_url="https://www.googleapis.com/bigquery/v2/"):
         self.client = client
         self.session = aiohttp.ClientSession()
+        self._base_url = base_url
 
     def __enter__(self):
         return self
@@ -88,6 +90,7 @@ class _BigQueryClientSession:
 
         url, headers, body = await self._add_token(
             STREAMING_URL.format(
+                base_url=self._base_url,
                 project_id=self.client.project_id,
                 dataset_id=self.client.dataset,
                 table_id=self.client.table,
