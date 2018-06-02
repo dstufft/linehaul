@@ -16,16 +16,12 @@ import logging.config
 
 import click
 import prometheus_client
-import raven
 
 from . import _tls as tls
 from ._click import AsyncCommand
 from ._server import Server
 from .bigquery import BigQueryClient
 from .core import Linehaul
-
-
-__version__ = raven.fetch_package_version("linehaul")
 
 
 @click.command(
@@ -90,7 +86,6 @@ async def main(ctx, bind, port, token, account, key, reuse_port, tls_ciphers,
                 "level": "ERROR",
                 "class": "raven.handlers.logging.SentryHandler",
                 "dsn": sentry_dsn,
-                "release": __version__,
             },
         },
 
