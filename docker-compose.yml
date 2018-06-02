@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  bigquery:
+    build:
+      context: .
+      dockerfile: Dockerfile.bq
+
+  linehaul:
+    build:
+      context: .
+      args:
+        DEVEL: "yes"
+    command: python -m linehaul --bigquery-url http://bigquery:9090/ --port 8512 warehouse:warehouse:downloads
+    env_file: dev/environment
+    volumes:
+      # The :z option fixes permission issues with SELinux by setting a
+      # permissive security context.
+      - .:/opt/linehaul/src:z
+    ports:
+      - "8512:8512"
+    links:
+      - bigquery

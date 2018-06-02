@@ -1,0 +1,22 @@
+FROM golang:1.8
+
+# ENV FAKE_BIGQUERY_COMMIT=bb1b89fb512357cba8f7c45f17574fa3ed74be32
+#
+WORKDIR /app/
+#
+# RUN set -x \
+#     && git clone https://github.com/danielstutzman/fake-bigquery.git . \
+#     && git reset --hard $FAKE_BIGQUERY_COMMIT
+#
+RUN go get -v github.com/danielstutzman/fake-bigquery/
+
+ADD https://www.googleapis.com/discovery/v1/apis/bigquery/v2/rest discovery.json
+
+CMD ["fake-bigquery",  "-discovery-json-path", "/app/discovery.json", "-port", "9090"]
+
+# COPY . .
+#
+# RUN go get -d -v ./...
+# RUN go install -v ./...
+#
+# CMD ["app"]
