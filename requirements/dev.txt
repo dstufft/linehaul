@@ -1,6 +1,3 @@
 pip-tools
-pytest
 flake8
 coverage>=4.1b2
-pretend
-pytest-asyncio
