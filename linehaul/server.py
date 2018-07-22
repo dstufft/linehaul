@@ -23,7 +23,6 @@ import tenacity
 import trio
 
 from linehaul.bigquery import TokenFetchError, BigQueryError
-from linehaul.dogstats import statsd
 from linehaul.events import parser as _event_parser
 from linehaul.protocol import LineReceiver, BufferTooLargeError, TruncatedLineError
 from linehaul.syslog import parser as _syslog_parser
