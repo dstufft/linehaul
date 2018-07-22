@@ -24,6 +24,7 @@ import click
 import trio
 
 from linehaul.bigquery import BigQuery
+from linehaul.dogstats import statsd
 from linehaul.migration import migrate as migrate_
 from linehaul.server import server as server_
 
@@ -84,7 +85,31 @@ def _validate_base64(ctx, param, value):
     show_default=True,
     help="The verbosity of the console logger.",
 )
-def cli(log_level):
+@click.option(
+    "--datadog-host",
+    default="127.0.0.1",
+    metavar="ADDR",
+    show_default=True,
+    help="The host where the DogStatsD instance is located.",
+)
+@click.option(
+    "--datadog-port",
+    type=int,
+    default=8125,
+    metavar="PORT",
+    show_default=True,
+    help="The port that the DogStatsD instance is listening on.",
+)
+@click.option("--datadog-namespace", help="The namespace for DataDog metrics.")
+@click.option(
+    "--datadog-use-default-route/--datadog-no-use-default-route",
+    default=False,
+    show_default=True,
+    help="Use the default route to locate the DogStatsD instance.",
+)
+def cli(
+    log_level, datadog_host, datadog_port, datadog_namespace, datadog_use_default_route
+):
     """
     The Linehaul Statistics Daemon.
 
@@ -114,6 +139,13 @@ def cli(log_level):
             },
             "root": {"level": "SPEW", "handlers": ["console"]},
         }
+    )
+
+    statsd.configure(
+        host=datadog_host,
+        port=datadog_port,
+        namespace=datadog_namespace,
+        use_default_route=datadog_use_default_route,
     )
 
 
